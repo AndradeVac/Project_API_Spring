@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cadastro usuário</title>
+
+    <link rel="stylesheet" href="cssRegistrar.css">
+
+</head>
+
+<body>
+    <div class="screen">
+        <form id="form-Cadastro">
+
+            <div class="headCadastro" style="background-color: rgba(78, 155, 162, 0.642);">
+                <img class="imgLogo" width="10%" alt="LogoEmpresa" src="src/imgs/th.jpg" title="LogoERP">
+                <h2 id="tituloHead">Cadastro</h2>
+            </div>
+            <div id="bodyCadastro">
+
+                <div id="camposCadastro">
+
+                    <label for="usuario">Usuário</label>
+                    <input class="dadosPrimarios" type="text" id="usuario" name="usuario" required
+                        placeholder="Nome de usuario">
+                    <br>
+
+                    <label for="email">Email</label>
+                    <input class="dadosPrimarios" type="email" name="email" id="email" placeholder="Email de cadastro"
+                        required>
+
+                    <label for="senha">Senha</label>
+                    <input class="dadosPrimarios" type="password" id="senha" name="senha" placeholder="Digite sua s     enha"
+                        required><br>
+
+                    <label for="nascimento">Data de nascimento</label>
+                    <input class="dadosPrimarios" type="date" onchange="validarData(this)" name="nascimento"
+                        id="nascimento" required>
+                    <br>
+
+                    <a href="loginForm.html"> Voltar a pagina anterior </a>
+
+
+                    <button type="submit">Continuar</button>
+                </div>
+
+                <!-- 
+
+                <div id="continuacaoCadastro" style="background-color: rgb(141, 132, 132);">
+                    <h1 style="color: white;">Finalize o cadastro para continuar</h1>
+                </div>
+                -->
+
+            </div>
+        </form>
+    </div>
+</body>
+
+<script>
+
+
+    const formRegistro = document.getElementById("form-Registro")
+
+    formRegistro.addEventListener("submit", (evento) => {
+        evento.preventDefault();
+
+
+        const data = {
+            "usuario": document.getElementById("usuario").value,
+            "senha": document.getElementById("senha").value,
+            "email": document.getElementById("email").value,
+            "nascimento": document.getElementById("nascimento").value
+
+        };
+
+        console.log(data);
+
+
+        fetch("http://localhost:8040/registro", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify(data)
+
+         }).then(response => {
+
+            if (response.status == 201 /*Create*/ ){
+                alert("Cadastrado com sucesso");
+            }
+            else if (response.status == 409  /*Conflict — existing user*/){
+                alert("Usuario existente!");
+            } else {
+                console.log(response);
+                alert("Ocorreu uma falha");
+            }     
+         }).catch(e => {
+            console.error("Erro:", e);
+            alert("Ocorreu um erro durante o registro.");
+        })
+    })
+
+
+    const formCadastro = document.getElementById("form-Cadastro")
+
+    formCadastro.addEventListener('submit', (e) => {
+
+
+        const continuacaoCadastro = document.getElementById("continuacaoCadastro")
+
+        const dadosPrimarios = document.getElementsByClassName("dadosPrimarios")
+
+        continuacaoCadastro.style = null
+
+        Array.from(dadosPrimarios).forEach(e => {
+            console.log(e)
+            e.style.backgroundColor = "gray"
+            e.setAttribute("readonly", "true")
+        })
+
+        console.log(camposCadastro)
+
+
+        e.preventDefault()
+
+        fetch(formCadastro.tpCadastro.value)
+            .then(response => response.text())
+            .then(html => continuacaoCadastro.innerHTML = html)
+            .catch((error) => {
+                console.error('Erro na requisição:', error);
+                alert('Ocorreu um erro na requisição.');
+            });
+
+    })
+
+    function validarData(element) {
+       
+        if (element.value != "") {
+            setTimeout(() => {
+
+                const inputDate = new Date(element.value);
+                const hoje = new Date();
+
+                if (inputDate >= hoje
+                    || inputDate <= new Date(1900, 0, 1)) {
+                    element.value = "";
+                    element.style.border = "3px solid red";
+                    alert("Data inválida!")
+                } else {
+                    element.style.border = "";
+                }
+            }, 3000);
+        }
+    }
+
+</script>
+
+</html>
